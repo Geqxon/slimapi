@@ -1,6 +1,6 @@
 <?php
 
-declare(stricttypes=1);
+declare(strict_types=1);
 
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -14,16 +14,14 @@ $app->get('/api/sensoren', function(Request $request, Response $response) {
 
     $database = new App\Database;
 
-    $pdo = $database-> getConnection();
+    $repository = new App\Repositories\SensorRepository($database);
 
-    $stmt = $pdo->query('SELECT * FROM sensor');
-
-    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $data = $repository->getAllSensoren();
 
     $body = json_encode($data);
 
     $response->getBody()->write($body);
-    
+
     return $response->withHeader('Content-Type', 'application/json');
 });
 

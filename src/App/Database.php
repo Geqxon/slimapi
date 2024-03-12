@@ -1,6 +1,6 @@
 <?php
 
-declare (stricttypes=1); 
+declare (strict_types=1); 
 
 namespace App;
 
@@ -9,7 +9,7 @@ class Database
 { 
     public function getConnection(): PDO
     {
-        $dsn = "mysql:host=127.0.0.1;dbname=slim api;charset=utf8";
+        $dsn = "mysql:host=127.0.0.1;dbname=slim-api;charset=utf8";
 
         $pdo = new PDO($dsn, 'Lars', 'Welkom01', [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
