@@ -1,30 +1,30 @@
 <?php
 
-declare(strict_types=1);
+declare(stricttypes=1);
 
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-require Dirname(__DIR__) . '/vendor/autoload.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
 $app = AppFactory::create();
 
-$app->get('/api/sensoren', function(Request $request, Response $response){
+$app->get('/api/sensoren', function(Request $request, Response $response) {
 
-    $dsn = "mysql:host=127.0.0.1;dbname=slim-api;charset=utf8";
+    $database = new App\Database;
 
-    $pdo = new PDO($dsn, 'Lars', 'Welkom01',[
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    $pdo = $database-> getConnection();
 
-    $stmt = $pdo->query('SELECT * from sensor');
+    $stmt = $pdo->query('SELECT * FROM sensor');
 
-    $data = $stmt->fetchALL(PDO::FETCH_ASSOC);
+    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $body = json_encode($data);
+
     $response->getBody()->write($body);
-    return $response-> withHeader('Content-Type', 'application/json');
+    
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 $app->run();
