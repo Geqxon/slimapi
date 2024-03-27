@@ -36,4 +36,40 @@ class SensorRepository
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-}
+
+    public function addSensor(array $data): string
+    {
+        $sql = 'INSERT INTO sensor (Type, LocatieBeschrijving, Diepte)
+                Values (:type, :locatie, :diepte)';
+
+        $pdo = $this->database->getConnection();
+
+        $stmt = $pdo->prepare($sql);
+
+        if(empty($data['Type']))
+        {
+            $stmt->bindValue(':type', null, PDO::PARAM_NULL);
+        }else{
+            $stmt->bindValue(':type', $data['Type'], PDO::PARAM_STR);
+        }
+
+        if(empty($data['LocatieBeschrijving']))
+        {
+            $stmt->bindValue(':locatie', null, PDO::PARAM_NULL);
+        }else{
+            $stmt->bindValue(':locatie', $data['LocatieBeschrijving'], PDO::PARAM_STR);
+        }
+
+        if(empty($data['Diepte']))
+        {
+            $stmt->bindValue(':diepte', null, PDO::PARAM_NULL);
+        }else{
+            $stmt->bindValue(':diepte', $data['Diepte'], PDO::PARAM_STR);
+        }
+        
+        $stmt->execute();
+
+        return $pdo->lastInsertId();
+
+        }
+    }

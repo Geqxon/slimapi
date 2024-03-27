@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Middleware\ApikeyMiddleware;
 use Slim\Factory\AppFactory;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -26,18 +27,19 @@ $app = AppFactory::create();
 $collector = $app->getRouteCollector();
 $collector->setDefaultInvocationStrategy(new StrategiesRequestResponseArgs);
 
-$app->get('/api/sensoren', function(Request $request, Response $response) {
+$app->addBodyParsingMiddleware();
 
-    $repository = $this->get (App\Repositories\SensorRepository::class);
+$error_middleware = $app->addErrorMiddleware(true, true, true);
 
-    $data = $repository->getAllSensoren();
+$error_handler = $error_middleware->getDefaultErrorhandler();
 
-    $body = json_encode($data);
+$error_handler->forceContentType('application/json');
 
-    $response->getBody()->write($body);
+$app->add(new ApikeyMiddleware);
 
-    return $response->withHeader('Content-Type', 'application/json');
-});
+$app->get('/api/sensoren', App\Controlers\sensoren::class . ':showALLSensoren');
+
+$app->post('/api/sensoren', App\Controlers\sensoren::class . ':addSensor');
 
 $app->get('/api/sensoren/{id:[0-9]+}', function(Request $request, Response $response, string $id){
     
