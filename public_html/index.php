@@ -61,38 +61,13 @@ $app->get('/api/sensoren/{id:[0-9]+}', function(Request $request, Response $resp
 });
 
 
-
 //metingen
-$app->get('/api/metingen', function(Request $request, Response $response) {
+$app->get('/api/metingen', App\Controlers\Metingen::class . ':showAllMetingen');
 
-    $repository = $this->get (App\Repositories\MetingRepository::class);
+$app->get('/api/metingen/{id:[0-9]+}', App\Controlers\Metingen::class . ':showSingleMeting');
 
-    $data = $repository->getAllMetingen();
+$app->post('/api/metingen' , App\Controlers\Metingen::class . ':addMeting');
 
-    $body = json_encode($data);
-
-    $response->getBody()->write($body);
-
-    return $response->withHeader('Content-Type', 'application/json');
-});
-
-$app->get('/api/metingen/{id:[0-9]+}', function(Request $request, Response $response, string $id){
-    
-    $repository = $this->get (App\Repositories\MetingRepository::class);
-
-    $data = $repository->getMetingById((int) $id);
-
-    if($data === false) {
-        throw new \Slim\Exception\HttpNotFoundException($request,
-                                                        message:"Meting bestaat niet");
-    }
-
-    $body = json_encode($data);
-
-    $response->getBody()->write($body);
-
-    return $response->withHeader('Content-Type', 'application/json');
-
-});
+$app->get('/api/metingen/filters', App\Controlers\Metingen::class . ':getFilteredMetingen');
 
 $app->run();
