@@ -68,6 +68,6 @@ $app->get('/api/metingen/{id:[0-9]+}', App\Controlers\Metingen::class . ':showSi
 
 $app->post('/api/metingen' , App\Controlers\Metingen::class . ':addMeting');
 
-$app->get('/api/metingen/filters', App\Controlers\Metingen::class . ':getFilteredMetingen');
+$app->get('/api/metingen/filters', App\Controlers\Metingen::class . ':getFilterdMetingen');
 
 $app->run();

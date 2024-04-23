@@ -13,16 +13,16 @@ class MetingRepository
     {
     }
 
-    public function getAllMetingen():array
+    public function getAllMetingen(): array
     {
         $pdo = $this->database->getConnection();
 
         $stmt = $pdo->query('SELECT * FROM meting');
-    
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getMetingById(int $id) : array | bool
+    public function getMetingById(int $id): array | bool
     {
         $sql = 'SELECT * FROM meting WHERE MetingID = :id';
 
@@ -46,54 +46,74 @@ class MetingRepository
 
         $stmt = $pdo->prepare($sql);
 
-        if(empty($data['SensorID']))
-        {
+        if (empty($data['SensorID'])) {
             $stmt->bindValue(':Sensor', null, PDO::PARAM_NULL);
-        }else{
+        } else {
             $stmt->bindValue(':Sensor', $data['SensorID'], PDO::PARAM_STR);
         }
 
-        if(empty($data['Waarde']))
-        {
+        if (empty($data['Waarde'])) {
             $stmt->bindValue(':Waarden', null, PDO::PARAM_NULL);
-        }else{
+        } else {
             $stmt->bindValue(':Waarden', $data['Waarde'], PDO::PARAM_STR);
         }
-        
+
         $stmt->execute();
 
         return $pdo->lastInsertId();
-        }
-
-        public function getFilterdMetingen($Params)
-        {
-            $pdo = $this->database->getConnection();
-
-            $sql = "SELECT * FROM meting WHERE 1=1";
-
-            if(!empty($Params['startDatum'])) {
-                $sql.= "AND Timestamp >= :startDatum";
-            }
-
-            if(!empty($Params['eindDatum'])) {
-                $sql.= "AND Timestamp <= :eindDatum";
-            }
-
-            if(!empty($Params['sensorID'])) {
-                $sql.= "AND SensorID = :sensorID";
-            }
-
-            //sorteer volgorde
-            if(!empty($Params(['sorteerVolgorde']) && 
-            in_array(strtolower($Params['sorteerVolgorde']), ['asc', 'desc'])))
-            {
-                $sql .= "ORDER BY MetingID" .
-                strtoupper($Params['sorteerVolgorde']);
-            }
-
-            if(!empty($Params['aantal']) && is_numeric($Params['aantal'])) {
-                $sql .= "LIMET :aantal";
-            }
-        }
-
     }
+
+    public function getFilterdMetingen($Params)
+    {
+        $pdo = $this->database->getConnection();
+
+        $sql = "SELECT * FROM meting WHERE 1=1";
+
+        if (!empty($Params['startDatum'])) {
+            $sql .= " AND Timestamp >= :startDatum";
+        }
+
+        if (!empty($Params['eindDatum'])) {
+            $sql .= " AND Timestamp <= :eindDatum";
+        }
+
+        if (!empty($Params['sensorID'])) {
+            $sql .= " AND SensorID = :sensorID";
+        }
+
+        // Sortering toevoegen aan SQL
+        if (
+            !empty($params['sorteerVolgorde']) &&
+            in_array(strtolower($params['sorteerVolgorde']), ['asc', 'desc'])
+        ) {
+            $sql .= " ORDER BY MetingID " .
+                strtoupper($params['sorteerVolgorde']);
+        }
+
+        if (!empty($Params['aantal']) && is_numeric($Params['aantal'])) {
+            $sql .= " LIMIT :aantal";
+        }
+
+        $stmt = $pdo->prepare($sql);
+
+        if (!empty($Params['startDatum'])) {
+            $stmt->bindValue(':startDatum', $Params['startDatum'], PDO::PARAM_STR);
+        }
+
+        if (!empty($Params['eindDatum'])) {
+            $stmt->bindValue(':eindDatum', $Params['eindDatum'], PDO::PARAM_STR);
+        }
+
+        if (!empty($Params['sensorID'])) {
+            $stmt->bindValue(':sensorID', $Params['sensorID'], PDO::PARAM_INT);
+        }
+
+        if (!empty($Params['aantal']) && is_numeric($Params['aantal'])) {
+            $stmt->bindValue(':aantal', (int)$Params['aantal'], PDO::PARAM_INT);
+        }
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+}
